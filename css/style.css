@@ -93,6 +93,10 @@ nav a:hover::after {
   background: linear-gradient(135deg, rgba(74, 108, 247, 0.1), rgba(0, 217, 255, 0.1));
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero::before {
@@ -108,6 +112,8 @@ nav a:hover::after {
 .hero-content {
   position: relative;
   z-index: 1;
+  text-align: center;
+  padding: 2rem;
 }
 
 .hero-content h1 {
@@ -141,6 +147,7 @@ nav a:hover::after {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  margin: 0.5rem;
 }
 
 .cta-button::before {
@@ -175,6 +182,7 @@ nav a:hover::after {
   align-items: center;
   max-width: 1000px;
   margin: 0 auto;
+  padding: 4rem 0;
 }
 
 .profile-photo {
@@ -189,6 +197,30 @@ nav a:hover::after {
 
 .profile-photo:hover {
   transform: rotate(0deg) scale(1.05);
+}
+
+/* Three.js Containers */
+.three-container {
+  position: relative;
+  min-height: 400px;
+  background: var(--light-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.three-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.three-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Animations */
@@ -225,6 +257,10 @@ nav a:hover::after {
   
   .profile-photo {
     margin: 0 auto;
+  }
+
+  .three-container {
+    min-height: 300px;
   }
 }
 
@@ -287,16 +323,17 @@ body.dark-mode footer {
 /* Loading States */
 .loading {
   position: relative;
-  min-height: 200px;
+  min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--light-bg);
 }
 
 .loading::after {
   content: '';
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border: 3px solid var(--light-bg);
   border-top-color: var(--primary-color);
   border-radius: 50%;
@@ -308,23 +345,6 @@ body.dark-mode footer {
 }
 
 /* Performance Optimizations */
-.three-container {
-  position: relative;
-  min-height: 300px;
-  background: var(--light-bg);
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.three-container canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Optimize animations */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

@@ -9,11 +9,34 @@ class CubeDemo {
         this.animationId = null;
         this.materials = [];
         this.time = 0;
-        this.particles = null;
         this.mouseX = 0;
         this.mouseY = 0;
         this.targetRotationX = 0;
         this.targetRotationY = 0;
+        this.isDragging = false;
+        this.previousMousePosition = { x: 0, y: 0 };
+        this.rotationSpeed = 0.01;
+        this.dragDamping = 0.95;
+        this.autoRotateSpeed = 0.003;
+        this.hovered = false;
+        this.scale = 1;
+        this.targetScale = 1;
+        this.pulseSpeed = 0.02;
+        this.pulseAmount = 0.1;
+        this.colorTransitionSpeed = 0.03;
+        this.currentColorIndex = 0;
+        this.targetColorIndex = 0;
+        this.movementThreshold = 0.01;
+        this.lastRotationX = 0;
+        this.lastRotationY = 0;
+        this.colorPalette = [
+            0xff3366, 0x00ff99, 0x3366ff, 0xffcc00, 0xff00ff, 0x00ffff,
+            0xff6600, 0x00ff00, 0x6600ff, 0xffff00, 0xff0066, 0x00ffcc,
+            0xff1493, 0x00bfff, 0xff4500, 0x32cd32, 0xff69b4, 0x00fa9a
+        ];
+        this.hoverScale = 1.2;
+        this.hoverShininess = 150;
+        this.lightIntensity = 1.5;
         console.log('CubeDemo instance created');
     }
 
@@ -21,75 +44,109 @@ class CubeDemo {
         try {
             console.log('Initializing cube demo...');
             
-            // Create scene
+            // Create scene with gradient background
             this.scene = new THREE.Scene();
-            this.scene.background = new THREE.Color(0x000000);
+            const gradientTexture = new THREE.TextureLoader().load('images/gradient.png');
+            this.scene.background = gradientTexture;
             
-            // Create camera
+            // Create camera with better positioning
             this.camera = new THREE.PerspectiveCamera(
                 75,
                 this.container.clientWidth / this.container.clientHeight,
                 0.1,
                 1000
             );
-            this.camera.position.z = 5;
+            this.camera.position.z = 6;
 
-            // Create renderer
+            // Create renderer with enhanced quality
             this.renderer = new THREE.WebGLRenderer({ 
-                antialias: false, // Disable antialiasing for better performance
+                antialias: true,
+                alpha: true,
                 powerPreference: "high-performance"
             });
             this.renderer.setSize(
                 this.container.clientWidth,
                 this.container.clientHeight
             );
-            this.container.innerHTML = ''; // Clear any existing content
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.container.innerHTML = '';
             this.container.appendChild(this.renderer.domElement);
 
-            // Reduce shadow quality
-            this.renderer.shadowMap.enabled = false;
+            // Enable enhanced shadows
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this.renderer.outputEncoding = THREE.sRGBEncoding;
 
-            // Create colorful cube
+            // Create cube with enhanced materials
             const geometry = new THREE.BoxGeometry(2, 2, 2);
             
-            // Create materials with different colors for each face
-            this.materials = [
-                new THREE.MeshPhongMaterial({ color: 0xff0000, shininess: 100 }), // Red (right)
-                new THREE.MeshPhongMaterial({ color: 0x00ff00, shininess: 100 }), // Green (left)
-                new THREE.MeshPhongMaterial({ color: 0x0000ff, shininess: 100 }), // Blue (top)
-                new THREE.MeshPhongMaterial({ color: 0xffff00, shininess: 100 }), // Yellow (bottom)
-                new THREE.MeshPhongMaterial({ color: 0xff00ff, shininess: 100 }), // Magenta (front)
-                new THREE.MeshPhongMaterial({ color: 0x00ffff, shininess: 100 })  // Cyan (back)
-            ];
+            // Create materials with dynamic color scheme
+            this.materials = this.colorPalette.slice(0, 6).map(color => 
+                new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    shininess: 100,
+                    specular: 0x888888,
+                    flatShading: true,
+                    emissive: 0x000000,
+                    emissiveIntensity: 0
+                })
+            );
             
             // Create cube with materials
             this.cube = new THREE.Mesh(geometry, this.materials);
+            this.cube.castShadow = true;
+            this.cube.receiveShadow = true;
             this.scene.add(this.cube);
 
-            // Add surrounding particles
-            this.addParticles();
-
-            // Add lights
-            const light = new THREE.DirectionalLight(0xffffff, 1);
-            light.position.set(1, 1, 1);
-            this.scene.add(light);
+            // Enhanced lighting setup
+            const mainLight = new THREE.DirectionalLight(0xffffff, 2.0);
+            mainLight.position.set(1, 1, 1);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            mainLight.shadow.camera.near = 0.5;
+            mainLight.shadow.camera.far = 50;
+            mainLight.shadow.camera.left = -10;
+            mainLight.shadow.camera.right = 10;
+            mainLight.shadow.camera.top = 10;
+            mainLight.shadow.camera.bottom = -10;
+            this.scene.add(mainLight);
             
-            // Add a second light from another angle
-            const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
-            light2.position.set(-1, -1, -1);
-            this.scene.add(light2);
+            // Add dynamic colored lights
+            this.pointLights = [
+                new THREE.PointLight(0xff3366, 1.0, 10),
+                new THREE.PointLight(0x00ff99, 1.0, 10),
+                new THREE.PointLight(0x3366ff, 1.0, 10),
+                new THREE.PointLight(0xffcc00, 1.0, 10)
+            ];
+            
+            this.pointLights.forEach((light, index) => {
+                light.position.set(
+                    Math.cos(index * Math.PI * 2 / 4) * 4,
+                    Math.sin(index * Math.PI * 2 / 4) * 4,
+                    2
+                );
+                this.scene.add(light);
+            });
             
             // Add ambient light
-            this.scene.add(new THREE.AmbientLight(0x404040));
+            this.scene.add(new THREE.AmbientLight(0x404040, 0.8));
 
             // Add mouse interaction
             this.container.addEventListener('mousemove', (event) => this.onMouseMove(event));
+            this.container.addEventListener('mousedown', (event) => this.onMouseDown(event));
+            this.container.addEventListener('mouseup', () => this.onMouseUp());
+            this.container.addEventListener('mouseleave', () => this.onMouseUp());
+            this.container.addEventListener('touchstart', (event) => this.onTouchStart(event));
             this.container.addEventListener('touchmove', (event) => this.onTouchMove(event));
-            this.container.addEventListener('mouseout', () => {
-                // Reset to auto-rotation when mouse leaves
-                this.targetRotationX = 0;
-                this.targetRotationY = 0;
-            });
+            this.container.addEventListener('touchend', () => this.onMouseUp());
+
+            // Add hover effect
+            this.container.addEventListener('mouseenter', () => this.onMouseEnter());
+            this.container.addEventListener('mouseleave', () => this.onMouseLeave());
+
+            // Add click handler for color change
+            this.container.addEventListener('click', () => this.changeColors());
 
             // Start animation
             this.animate();
@@ -111,53 +168,52 @@ class CubeDemo {
         }
     }
 
-    addParticles() {
-        // Create particles around the cube
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 1000; // Reduced from 3000
-        const posArray = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-        
-        for (let i = 0; i < particleCount * 3; i += 3) {
-            // Position particles in a sphere around the cube
-            const radius = 3 + Math.random() * 2;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.random() * Math.PI;
-            
-            posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
-            posArray[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
-            posArray[i + 2] = radius * Math.cos(phi);
-            
-            // Random colors for particles
-            colors[i] = Math.random();
-            colors[i + 1] = Math.random();
-            colors[i + 2] = Math.random();
-        }
-        
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        
-        const particleSize = 0.05; // Smaller particles
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0x4a6cf7,
-            wireframe: true // Use wireframe for better performance
-        });
-        
-        this.particles = new THREE.Points(particlesGeometry, material);
-        this.scene.add(this.particles);
-    }
-
     onMouseMove(event) {
         const rect = this.container.getBoundingClientRect();
-        const relX = event.clientX - rect.left;
-        const relY = event.clientY - rect.top;
-        
-        this.mouseX = (relX / this.container.clientWidth) * 2 - 1;
-        this.mouseY = -(relY / this.container.clientHeight) * 2 + 1;
-        
-        // Set target rotation based on mouse position
-        this.targetRotationY = this.mouseX * 2;
-        this.targetRotationX = this.mouseY * 2;
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        // Update target rotation based on mouse position
+        this.targetRotationY = x * this.rotationSpeed;
+        this.targetRotationX = y * this.rotationSpeed;
+
+        // Update light positions based on mouse
+        this.pointLights.forEach((light, index) => {
+            light.position.x = Math.cos(this.time * 0.5 + index * Math.PI * 2 / 4 + x) * 4;
+            light.position.y = Math.sin(this.time * 0.5 + index * Math.PI * 2 / 4 + y) * 4;
+        });
+
+        // Change color based on movement
+        if (Math.abs(this.targetRotationX - this.lastRotationX) > this.movementThreshold ||
+            Math.abs(this.targetRotationY - this.lastRotationY) > this.movementThreshold) {
+            this.targetColorIndex = (this.targetColorIndex + 1) % this.colorPalette.length;
+        }
+
+        this.lastRotationX = this.targetRotationX;
+        this.lastRotationY = this.targetRotationY;
+    }
+
+    onMouseDown(event) {
+        this.isDragging = true;
+        this.previousMousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+
+    onMouseUp() {
+        this.isDragging = false;
+    }
+
+    onTouchStart(event) {
+        if (event.touches.length === 1) {
+            event.preventDefault();
+            this.isDragging = true;
+            this.previousMousePosition = {
+                x: event.touches[0].clientX,
+                y: event.touches[0].clientY
+            };
+        }
     }
 
     onTouchMove(event) {
@@ -165,16 +221,45 @@ class CubeDemo {
             event.preventDefault();
             const touch = event.touches[0];
             const rect = this.container.getBoundingClientRect();
-            const relX = touch.clientX - rect.left;
-            const relY = touch.clientY - rect.top;
-            
-            this.mouseX = (relX / this.container.clientWidth) * 2 - 1;
-            this.mouseY = -(relY / this.container.clientHeight) * 2 + 1;
-            
-            // Set target rotation based on touch position
-            this.targetRotationY = this.mouseX * 2;
-            this.targetRotationX = this.mouseY * 2;
+            const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+            this.targetRotationY = x * this.rotationSpeed;
+            this.targetRotationX = y * this.rotationSpeed;
+
+            this.previousMousePosition = {
+                x: touch.clientX,
+                y: touch.clientY
+            };
         }
+    }
+
+    onMouseEnter() {
+        this.hovered = true;
+        this.targetScale = this.hoverScale;
+        if (this.cube) {
+            this.cube.material.forEach(material => {
+                material.shininess = this.hoverShininess;
+                material.specular.setHex(0xaaaaaa);
+                material.emissiveIntensity = 0.3;
+            });
+        }
+    }
+
+    onMouseLeave() {
+        this.hovered = false;
+        this.targetScale = 1;
+        if (this.cube) {
+            this.cube.material.forEach(material => {
+                material.shininess = 100;
+                material.specular.setHex(0x888888);
+                material.emissiveIntensity = 0;
+            });
+        }
+    }
+
+    changeColors() {
+        this.targetColorIndex = (this.targetColorIndex + 1) % this.colorPalette.length;
     }
 
     animate() {
@@ -183,60 +268,49 @@ class CubeDemo {
         this.time += 0.01;
         
         if (this.cube) {
-            // Smooth rotation towards target (mouse-controlled or auto)
-            if (Math.abs(this.mouseX) < 0.01 && Math.abs(this.mouseY) < 0.01) {
-                // Auto-rotation when no mouse input
-                this.cube.rotation.x += 0.01;
-                this.cube.rotation.y += 0.01;
-            } else {
-                // Mouse-controlled rotation
-                this.cube.rotation.x += (this.targetRotationX - this.cube.rotation.x) * 0.05;
-                this.cube.rotation.y += (this.targetRotationY - this.cube.rotation.y) * 0.05;
+            // Enhanced rotation logic
+            if (!this.isDragging) {
+                this.targetRotationY += this.autoRotateSpeed;
+                this.targetRotationX = Math.sin(this.time * 0.2) * 0.1;
             }
             
-            // Animate colors for extra visual appeal
-            if (this.materials && this.materials.length === 6) {
-                // Shift hue of each face over time
-                for (let i = 0; i < this.materials.length; i++) {
-                    const hue = (this.time * 0.1 + i / 6) % 1;
-                    const color = new THREE.Color().setHSL(hue, 0.8, 0.5);
-                    this.materials[i].color = color;
-                }
+            // Apply smooth rotation with damping
+            this.cube.rotation.x += (this.targetRotationX - this.cube.rotation.x) * this.dragDamping;
+            this.cube.rotation.y += (this.targetRotationY - this.cube.rotation.y) * this.dragDamping;
+
+            // Change color based on rotation
+            if (Math.abs(this.cube.rotation.x - this.lastRotationX) > this.movementThreshold ||
+                Math.abs(this.cube.rotation.y - this.lastRotationY) > this.movementThreshold) {
+                this.targetColorIndex = (this.targetColorIndex + 1) % this.colorPalette.length;
             }
-        }
-        
-        // Animate particles
-        if (this.particles) {
-            const positions = this.particles.geometry.attributes.position.array;
-            const colors = this.particles.geometry.attributes.color.array;
-            
-            for (let i = 0; i < positions.length; i += 3) {
-                // Make particles orbit around the cube
-                const x = positions[i];
-                const y = positions[i + 1];
-                const z = positions[i + 2];
-                
-                const angle = this.time * 0.2;
-                const radius = Math.sqrt(x * x + z * z);
-                
-                positions[i] = Math.cos(angle + i * 0.01) * radius;
-                positions[i + 2] = Math.sin(angle + i * 0.01) * radius;
-                
-                // Pulse colors
-                const colorIndex = Math.floor(i / 3);
-                const hue = (this.time * 0.1 + colorIndex * 0.01) % 1;
-                const color = new THREE.Color().setHSL(hue, 0.8, 0.5);
-                
-                colors[i] = color.r;
-                colors[i + 1] = color.g;
-                colors[i + 2] = color.b;
-            }
-            
-            this.particles.geometry.attributes.position.needsUpdate = true;
-            this.particles.geometry.attributes.color.needsUpdate = true;
-            
-            // Rotate the entire particle system
-            this.particles.rotation.y += 0.002;
+
+            this.lastRotationX = this.cube.rotation.x;
+            this.lastRotationY = this.cube.rotation.y;
+
+            // Smooth scale animation
+            this.scale += (this.targetScale - this.scale) * 0.1;
+            this.cube.scale.set(this.scale, this.scale, this.scale);
+
+            // Add subtle pulse effect
+            const pulseScale = 1 + Math.sin(this.time * this.pulseSpeed) * this.pulseAmount;
+            this.cube.scale.multiplyScalar(pulseScale);
+
+            // Animate point lights
+            this.pointLights.forEach((light, index) => {
+                light.intensity = 1.0 + Math.sin(this.time * 0.5 + index) * 0.3;
+                // Change light colors based on movement
+                const colorIndex = (this.targetColorIndex + index) % this.colorPalette.length;
+                light.color.setHex(this.colorPalette[colorIndex]);
+            });
+
+            // Color transition with movement-based changes
+            this.currentColorIndex += (this.targetColorIndex - this.currentColorIndex) * this.colorTransitionSpeed;
+            this.materials.forEach((material, index) => {
+                const currentColor = new THREE.Color(this.colorPalette[Math.floor(this.currentColorIndex)]);
+                const nextColor = new THREE.Color(this.colorPalette[Math.ceil(this.currentColorIndex) % this.colorPalette.length]);
+                const t = this.currentColorIndex % 1;
+                material.color.lerpColors(currentColor, nextColor, t);
+            });
         }
         
         if (this.renderer && this.scene && this.camera) {
@@ -264,6 +338,26 @@ class WaveDemo {
         this.time = 0;
         this.mouseX = 0;
         this.mouseY = 0;
+        this.isDragging = false;
+        this.previousMousePosition = { x: 0, y: 0 };
+        this.rotationSpeed = 0.006;
+        this.rotationDamping = 0.97;
+        this.particleCount = 8000;
+        this.gridSize = 80;
+        this.waveSpeed = 0.015;
+        this.waveAmplitude = 2.0;
+        this.mouseInfluence = 0.5;
+        this.targetRotationX = 0;
+        this.targetRotationY = 0;
+        this.autoRotateSpeed = 0.001;
+        this.colorScheme = {
+            primary: 0x00bfff,
+            secondary: 0x00ff7f,
+            accent: 0xff69b4,
+            ocean: 0x1e90ff,
+            coral: 0xff7f50,
+            turquoise: 0x40e0d0
+        };
         console.log('WaveDemo instance created');
     }
 
@@ -271,40 +365,50 @@ class WaveDemo {
         try {
             console.log('Initializing wave demo...');
             
-            // Create scene
+            // Create scene with gradient background
             this.scene = new THREE.Scene();
-            this.scene.background = new THREE.Color(0x000000);
+            const gradientTexture = new THREE.TextureLoader().load('images/gradient.png');
+            this.scene.background = gradientTexture;
             
-            // Create camera
+            // Create camera with better positioning
             this.camera = new THREE.PerspectiveCamera(
                 75,
                 this.container.clientWidth / this.container.clientHeight,
                 0.1,
                 1000
             );
-            this.camera.position.z = 15;
+            this.camera.position.z = 20;
 
-            // Create renderer
+            // Create renderer with enhanced quality
             this.renderer = new THREE.WebGLRenderer({ 
-                antialias: false, // Disable antialiasing for better performance
+                antialias: true,
+                alpha: true,
                 powerPreference: "high-performance"
             });
             this.renderer.setSize(
                 this.container.clientWidth,
                 this.container.clientHeight
             );
-            this.container.innerHTML = ''; // Clear any existing content
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.container.innerHTML = '';
             this.container.appendChild(this.renderer.domElement);
 
-            // Reduce shadow quality
-            this.renderer.shadowMap.enabled = false;
+            // Enable enhanced shadows
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this.renderer.outputEncoding = THREE.sRGBEncoding;
 
-            // Create enhanced particle system
+            // Create particle system
             this.createWaveParticles();
 
             // Add mouse interaction
             this.container.addEventListener('mousemove', (event) => this.onMouseMove(event));
+            this.container.addEventListener('mousedown', (event) => this.onMouseDown(event));
+            this.container.addEventListener('mouseup', () => this.onMouseUp());
+            this.container.addEventListener('mouseleave', () => this.onMouseUp());
+            this.container.addEventListener('touchstart', (event) => this.onTouchStart(event));
             this.container.addEventListener('touchmove', (event) => this.onTouchMove(event));
+            this.container.addEventListener('touchend', () => this.onMouseUp());
 
             // Start animation
             this.animate();
@@ -328,89 +432,140 @@ class WaveDemo {
 
     createWaveParticles() {
         const geometry = new THREE.BufferGeometry();
-        const particleCount = 1000; // Reduced from 3000
         
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-        const sizes = new Float32Array(particleCount);
+        const positions = new Float32Array(this.particleCount * 3);
+        const colors = new Float32Array(this.particleCount * 3);
+        const sizes = new Float32Array(this.particleCount);
         
-        const width = 30;
-        const height = 30;
-        
-        for (let i = 0; i < particleCount; i++) {
-            // Position particles in a grid pattern
-            const ix = i % width;
-            const iy = Math.floor(i / width);
+        for (let i = 0; i < this.particleCount; i++) {
+            const ix = i % this.gridSize;
+            const iy = Math.floor(i / this.gridSize);
             
-            const x = (ix / width - 0.5) * 20;
-            const y = 0; // Will be animated
-            const z = (iy / height - 0.5) * 20;
+            const x = (ix / this.gridSize - 0.5) * 60;
+            const y = 0;
+            const z = (iy / this.gridSize - 0.5) * 60;
             
             positions[i * 3] = x;
             positions[i * 3 + 1] = y;
             positions[i * 3 + 2] = z;
             
-            // Color gradient based on position
-            const hue = (x + 10) / 20; // 0 to 1 based on x position
-            const color = new THREE.Color().setHSL(hue, 0.8, 0.5);
+            // Enhanced color gradient with multiple colors
+            const distance = Math.sqrt(x * x + z * z);
+            const hue = (distance / 30) % 1;
+            const color = new THREE.Color().setHSL(hue, 0.8, 0.6);
             
             colors[i * 3] = color.r;
             colors[i * 3 + 1] = color.g;
             colors[i * 3 + 2] = color.b;
             
-            // Random sizes for particles
-            sizes[i] = Math.random() * 0.1 + 0.05;
+            // Smaller, more varied particle sizes
+            sizes[i] = Math.random() * 0.15 + 0.05;
         }
         
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
         
-        // Use simpler materials
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0x4a6cf7,
-            wireframe: true // Use wireframe for better performance
+        // Enhanced shader material with sea-like waves
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                mousePosition: { value: new THREE.Vector2(0, 0) },
+                colorA: { value: new THREE.Color(this.colorScheme.primary) },
+                colorB: { value: new THREE.Color(this.colorScheme.secondary) },
+                colorC: { value: new THREE.Color(this.colorScheme.accent) }
+            },
+            vertexShader: `
+                attribute float size;
+                uniform float time;
+                uniform vec2 mousePosition;
+                varying vec3 vColor;
+                
+                void main() {
+                    vColor = color;
+                    vec3 pos = position;
+                    
+                    // Sea-like wave animation with multiple frequencies
+                    float wave = sin(pos.x * 0.1 + time) * 2.0;
+                    wave += sin(pos.z * 0.1 + time * 0.8) * 1.5;
+                    wave += sin((pos.x + pos.z) * 0.05 + time * 0.4) * 1.0;
+                    wave += sin(pos.x * 0.05 + pos.z * 0.05 + time * 0.2) * 0.5;
+                    
+                    // Improved mouse influence with ripple effect
+                    float dist = length(vec2(pos.x, pos.z) - mousePosition);
+                    float mouseInfluence = smoothstep(20.0, 0.0, dist);
+                    wave += sin(dist * 0.1 - time * 2.0) * mouseInfluence * 0.5;
+                    
+                    // Add some randomness to wave height
+                    wave *= (1.0 + sin(pos.x * 0.2 + pos.z * 0.2) * 0.1);
+                    
+                    pos.y = wave;
+                    
+                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                    gl_PointSize = size * (300.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor;
+                uniform vec3 colorA;
+                uniform vec3 colorB;
+                uniform vec3 colorC;
+                
+                void main() {
+                    float dist = length(gl_PointCoord - vec2(0.5));
+                    if (dist > 0.5) discard;
+                    
+                    float alpha = 1.0 - smoothstep(0.45, 0.5, dist);
+                    
+                    // Enhanced color blending
+                    vec3 finalColor = mix(colorA, colorB, vColor.x);
+                    finalColor = mix(finalColor, colorC, vColor.y);
+                    finalColor = mix(finalColor, vColor, 0.3);
+                    
+                    gl_FragColor = vec4(finalColor, alpha);
+                }
+            `,
+            transparent: true,
+            vertexColors: true
         });
         
         this.points = new THREE.Points(geometry, material);
         this.scene.add(this.points);
     }
-    
-    createParticleTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 128;
-        canvas.height = 128;
-        
-        const context = canvas.getContext('2d');
-        const gradient = context.createRadialGradient(
-            canvas.width / 2,
-            canvas.height / 2,
-            0,
-            canvas.width / 2,
-            canvas.height / 2,
-            canvas.width / 2
-        );
-        
-        gradient.addColorStop(0, 'rgba(255,255,255,1)');
-        gradient.addColorStop(0.2, 'rgba(255,255,255,0.8)');
-        gradient.addColorStop(0.4, 'rgba(255,255,255,0.4)');
-        gradient.addColorStop(1, 'rgba(255,255,255,0)');
-        
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        
-        const texture = new THREE.Texture(canvas);
-        texture.needsUpdate = true;
-        return texture;
-    }
 
     onMouseMove(event) {
+        // Calculate mouse position in normalized device coordinates
         const rect = this.container.getBoundingClientRect();
-        const relX = event.clientX - rect.left;
-        const relY = event.clientY - rect.top;
-        
-        this.mouseX = (relX / this.container.clientWidth) * 2 - 1;
-        this.mouseY = -(relY / this.container.clientHeight) * 2 + 1;
+        this.mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        this.mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        // Update target rotation based on mouse position
+        this.targetRotationY = this.mouseX * this.mouseInfluence;
+        this.targetRotationX = this.mouseY * this.mouseInfluence;
+    }
+
+    onMouseDown(event) {
+        this.isDragging = true;
+        this.previousMousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+
+    onMouseUp() {
+        this.isDragging = false;
+    }
+
+    onTouchStart(event) {
+        if (event.touches.length === 1) {
+            event.preventDefault();
+            this.isDragging = true;
+            this.previousMousePosition = {
+                x: event.touches[0].clientX,
+                y: event.touches[0].clientY
+            };
+        }
     }
 
     onTouchMove(event) {
@@ -418,25 +573,39 @@ class WaveDemo {
             event.preventDefault();
             const touch = event.touches[0];
             const rect = this.container.getBoundingClientRect();
-            const relX = touch.clientX - rect.left;
-            const relY = touch.clientY - rect.top;
-            
-            this.mouseX = (relX / this.container.clientWidth) * 2 - 1;
-            this.mouseY = -(relY / this.container.clientHeight) * 2 + 1;
+            this.mouseX = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+            this.mouseY = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+            this.targetRotationY = this.mouseX * this.mouseInfluence;
+            this.targetRotationX = this.mouseY * this.mouseInfluence;
+
+            this.previousMousePosition = {
+                x: touch.clientX,
+                y: touch.clientY
+            };
         }
     }
 
     animate() {
         this.animationId = requestAnimationFrame(() => this.animate());
-        this.time += 0.05;
+        this.time += this.waveSpeed;
         
         if (this.points && this.points.material.uniforms) {
-            // Update time uniform for wave animation
+            // Update shader uniforms
             this.points.material.uniforms.time.value = this.time;
+            this.points.material.uniforms.mousePosition.value.set(
+                this.mouseX * 30,
+                this.mouseY * 30
+            );
             
-            // Apply mouse influence to rotation
-            this.points.rotation.x = this.mouseY * 0.2;
-            this.points.rotation.y = this.mouseX * 0.2;
+            // Auto-rotation when not dragging
+            if (!this.isDragging) {
+                this.targetRotationY += this.autoRotateSpeed;
+            }
+
+            // Apply smooth rotation with damping
+            this.points.rotation.x += (this.targetRotationX - this.points.rotation.x) * this.rotationDamping;
+            this.points.rotation.y += (this.targetRotationY - this.points.rotation.y) * this.rotationDamping;
         }
         
         if (this.renderer && this.scene && this.camera) {
