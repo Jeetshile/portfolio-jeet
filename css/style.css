@@ -192,11 +192,10 @@ nav a:hover::after {
   object-fit: cover;
   box-shadow: var(--shadow);
   transition: var(--transition);
-  transform: rotate(-5deg);
 }
 
 .profile-photo:hover {
-  transform: rotate(0deg) scale(1.05);
+  transform: scale(1.05);
 }
 
 /* Three.js Containers */
