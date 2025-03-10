@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Add Your Profile Photo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #4a6cf7;
+        }
+        .steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        code {
+            background: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .note {
+            background: #fffde7;
+            padding: 15px;
+            border-left: 4px solid #ffd600;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>How to Add Your Profile Photo</h1>
+    
+    <p>Your portfolio website is currently using a placeholder image for your profile photo. Follow these steps to add your actual photo:</p>
+    
+    <div class="steps">
+        <h2>Steps to Add Your Profile Photo:</h2>
+        <ol>
+            <li>Prepare your profile photo:
+                <ul>
+                    <li>Ideally, use a square image (e.g., 500x500 pixels)</li>
+                    <li>The image will be displayed as a circle, so center your face in the image</li>
+                    <li>Save it as JPG or PNG format</li>
+                </ul>
+            </li>
+            <li>Rename your photo to <code>profile-photo.jpg</code> (or update the HTML if using a different filename)</li>
+            <li>Place the file in the <code>images</code> folder of your portfolio website</li>
+            <li>Open <code>index.html</code> and update the image source:
+                <pre><code>&lt;img src="images/profile-photo.jpg" alt="Jeet Shile" class="profile-photo"&gt;</code></pre>
+            </li>
+            <li>Refresh your browser to see the changes</li>
+        </ol>
+    </div>
+    
+    <div class="note">
+        <strong>Note:</strong> If you're having trouble with the image path, make sure:
+        <ul>
+            <li>The <code>images</code> folder exists in the same directory as your <code>index.html</code> file</li>
+            <li>The filename and extension match exactly (case-sensitive on some servers)</li>
+            <li>You've cleared your browser cache (Ctrl+F5 or Cmd+Shift+R) to see the updated image</li>
+        </ul>
+    </div>
+    
+    <p>Once you've added your profile photo, you can delete this guide file.</p>
+</body>
+</html> 
