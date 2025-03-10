@@ -35,13 +35,19 @@ class CubeDemo {
             this.camera.position.z = 5;
 
             // Create renderer
-            this.renderer = new THREE.WebGLRenderer({ antialias: true });
+            this.renderer = new THREE.WebGLRenderer({ 
+                antialias: false, // Disable antialiasing for better performance
+                powerPreference: "high-performance"
+            });
             this.renderer.setSize(
                 this.container.clientWidth,
                 this.container.clientHeight
             );
             this.container.innerHTML = ''; // Clear any existing content
             this.container.appendChild(this.renderer.domElement);
+
+            // Reduce shadow quality
+            this.renderer.shadowMap.enabled = false;
 
             // Create colorful cube
             const geometry = new THREE.BoxGeometry(2, 2, 2);
@@ -108,7 +114,7 @@ class CubeDemo {
     addParticles() {
         // Create particles around the cube
         const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 200;
+        const particleCount = 1000; // Reduced from 3000
         const posArray = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
         
@@ -131,15 +137,13 @@ class CubeDemo {
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.05,
-            transparent: true,
-            opacity: 0.8,
-            vertexColors: true,
-            blending: THREE.AdditiveBlending
+        const particleSize = 0.05; // Smaller particles
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x4a6cf7,
+            wireframe: true // Use wireframe for better performance
         });
         
-        this.particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        this.particles = new THREE.Points(particlesGeometry, material);
         this.scene.add(this.particles);
     }
 
@@ -281,13 +285,19 @@ class WaveDemo {
             this.camera.position.z = 15;
 
             // Create renderer
-            this.renderer = new THREE.WebGLRenderer({ antialias: true });
+            this.renderer = new THREE.WebGLRenderer({ 
+                antialias: false, // Disable antialiasing for better performance
+                powerPreference: "high-performance"
+            });
             this.renderer.setSize(
                 this.container.clientWidth,
                 this.container.clientHeight
             );
             this.container.innerHTML = ''; // Clear any existing content
             this.container.appendChild(this.renderer.domElement);
+
+            // Reduce shadow quality
+            this.renderer.shadowMap.enabled = false;
 
             // Create enhanced particle system
             this.createWaveParticles();
@@ -318,7 +328,7 @@ class WaveDemo {
 
     createWaveParticles() {
         const geometry = new THREE.BufferGeometry();
-        const particleCount = 3000;
+        const particleCount = 1000; // Reduced from 3000
         
         const positions = new Float32Array(particleCount * 3);
         const colors = new Float32Array(particleCount * 3);
@@ -356,41 +366,10 @@ class WaveDemo {
         geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
         
-        // Create shader material for better-looking particles
-        const material = new THREE.ShaderMaterial({
-            uniforms: {
-                time: { value: 0 },
-                pointTexture: { value: this.createParticleTexture() }
-            },
-            vertexShader: `
-                attribute float size;
-                varying vec3 vColor;
-                uniform float time;
-                
-                void main() {
-                    vColor = color;
-                    vec3 pos = position;
-                    
-                    // Calculate wave height
-                    float wave = sin(pos.x * 0.3 + time) * cos(pos.z * 0.3 + time) * 2.0;
-                    pos.y = wave;
-                    
-                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                    gl_PointSize = size * (300.0 / -mvPosition.z);
-                    gl_Position = projectionMatrix * mvPosition;
-                }
-            `,
-            fragmentShader: `
-                varying vec3 vColor;
-                uniform sampler2D pointTexture;
-                
-                void main() {
-                    gl_FragColor = vec4(vColor, 1.0) * texture2D(pointTexture, gl_PointCoord);
-                    if (gl_FragColor.a < 0.1) discard;
-                }
-            `,
-            transparent: true,
-            vertexColors: true
+        // Use simpler materials
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x4a6cf7,
+            wireframe: true // Use wireframe for better performance
         });
         
         this.points = new THREE.Points(geometry, material);

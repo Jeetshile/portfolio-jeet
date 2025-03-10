@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/framework-demos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -53,7 +56,7 @@
         <div class="container">
             <h2>About Me</h2>
             <div class="about-content">
-                <img src="images/IMG-20250309-WA0002.png" alt="Jeet Shile - Python Developer" class="profile-photo">
+                <img data-src="images/IMG-20250309-WA0002.png" alt="Jeet Shile - Python Developer" class="profile-photo lazy">
                 <p>Hello! I'm Jeet Shile, a certified Python Developer with expertise in modern web technologies and software development. I specialize in building robust Python applications and creating responsive, user-friendly web solutions that solve real-world problems.</p>
                 <p>With a strong foundation in Python programming and full-stack development, I strive to write clean, efficient code that delivers exceptional user experiences. My expertise includes Python frameworks like Django and Flask, along with modern JavaScript libraries.</p>
                 <div class="tech-stack">
@@ -141,13 +144,17 @@
             <div class="threejs-grid">
                 <div class="demo-container">
                     <h3>Interactive Cube</h3>
-                    <div id="cube-container" class="canvas-container"></div>
+                    <div id="cube-container" class="canvas-container loading">
+                        <!-- Three.js content will be loaded here -->
+                    </div>
                     <p class="demo-description">An interactive 3D cube with dynamic lighting and color transitions. Move your mouse to rotate.</p>
                     <div class="quote-container" id="cube-quotes"></div>
                 </div>
                 <div class="demo-container">
                     <h3>Particle Wave</h3>
-                    <div id="wave-container" class="canvas-container"></div>
+                    <div id="wave-container" class="canvas-container loading">
+                        <!-- Three.js content will be loaded here -->
+                    </div>
                     <p class="demo-description">A mesmerizing wave of particles that responds to mouse movement and creates dynamic patterns.</p>
                     <div class="quote-container" id="wave-quotes"></div>
                 </div>

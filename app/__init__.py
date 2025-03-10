@@ -7,10 +7,12 @@ app = Flask(__name__, static_folder='../static', template_folder='../')
 # Configure CORS based on environment
 if os.environ.get('FLASK_ENV') == 'production':
     # In production, only allow requests from your domain
-    CORS(app, resources={r"/api/*": {"origins": ["https://your-domain.com"]}})
+    CORS(app, resources={r"/api/*": {"origins": ["https://portfolio-jeet.onrender.com"]}})
 else:
     # In development, allow all origins
     CORS(app)
+    # Enable debug mode in development
+    app.config['DEBUG'] = True
 
 # Import routes
 from app.routes import main_routes, api_routes
