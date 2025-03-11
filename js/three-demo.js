@@ -1,4 +1,4 @@
-// Define classes first
+ // Define classes first
 class CubeDemo {
     constructor(container) {
         this.container = container;
