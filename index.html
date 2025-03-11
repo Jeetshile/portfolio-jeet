@@ -20,24 +20,39 @@
     // Provide your Countly server URL and app key
     Countly.app_key = '2a7c10dcd1292e107b6af5f5acbb81ee';
     Countly.url = 'https://jeet-9859776896d0a.flex.countly.com';
-
+    Countly.debug = true; // Enable debug mode to see what's happening
+    
+    // Configure Countly
+    Countly.q.push(['track_sessions']);
+    Countly.q.push(['track_pageview']);
+    Countly.q.push(['track_clicks']);
+    Countly.q.push(['track_scrolls']);
+    
+    // Set secure protocol and other configurations
+    Countly.q.push(['track_errors']);
+    Countly.q.push(['enable_feedback', { widgets: ['nps', 'survey', 'rating'] }]);
+    
     // Load Countly script
     (function() {
-        var cly = document.createElement('script'); cly.type = 'text/javascript';
+        var cly = document.createElement('script'); 
+        cly.type = 'text/javascript';
         cly.async = true;
         cly.src = 'https://cdn.jsdelivr.net/npm/countly-sdk-web@latest/lib/countly.min.js';
         cly.onload = function() {
-            Countly.init();
-            // Track page views
-            Countly.q.push(['track_pageview']);
-            // Track user sessions
-            Countly.q.push(['track_sessions']);
-            // Track clicks
-            Countly.q.push(['track_clicks']);
-            // Track scrolls
-            Countly.q.push(['track_scrolls']);
+            Countly.init({
+                app_key: '2a7c10dcd1292e107b6af5f5acbb81ee',
+                url: 'https://jeet-9859776896d0a.flex.countly.com',
+                debug: true,
+                require_consent: true,
+                use_session_cookie: true,
+                interval: 2000,
+                storage: "localStorage",
+                secure_cookies: true,
+                session_update: 30
+            });
         };
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(cly, s);
+        var s = document.getElementsByTagName('script')[0]; 
+        s.parentNode.insertBefore(cly, s);
     })();
     </script>
 </head>
