@@ -10,6 +10,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Countly Analytics Integration -->
+    <script type='text/javascript'>
+    // Initialize Countly
+    var Countly = Countly || {};
+    Countly.q = Countly.q || [];
+
+    // Provide your Countly server URL and app key
+    Countly.app_key = '2a7c10dcd1292e107b6af5f5acbb81ee';
+    Countly.url = 'https://jeet-9859776896d0a.flex.countly.com';
+
+    // Load Countly script
+    (function() {
+        var cly = document.createElement('script'); cly.type = 'text/javascript';
+        cly.async = true;
+        cly.src = 'https://cdn.jsdelivr.net/npm/countly-sdk-web@latest/lib/countly.min.js';
+        cly.onload = function() {
+            Countly.init();
+            // Track page views
+            Countly.q.push(['track_pageview']);
+            // Track user sessions
+            Countly.q.push(['track_sessions']);
+            // Track clicks
+            Countly.q.push(['track_clicks']);
+            // Track scrolls
+            Countly.q.push(['track_scrolls']);
+        };
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(cly, s);
+    })();
+    </script>
 </head>
 <body>
     <header>
@@ -227,5 +257,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
     <script src="js/animations.js"></script>
+
+    <!-- Countly Events Tracking -->
+    <script src="js/countly-events.js"></script>
 </body>
 </html> 
