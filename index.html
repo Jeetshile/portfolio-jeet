@@ -35,21 +35,28 @@
                 url: 'https://jeet-9859776896d0a.flex.countly.com',
                 debug: true,
                 use_session_cookie: true,
-                interval: 5000,
+                interval: 10000,
                 storage: "localStorage",
                 secure_cookies: true,
-                session_update: 30,
+                session_update: 60,
                 inactivity_time: 20,
                 offline_mode: false,
-                force_post: true
+                force_post: false,
+                device_id: 'portfolio-' + new Date().getTime(),
+                metrics: {
+                    app_version: '1.0',
+                    platform: 'web'
+                }
             });
 
             // Track events after initialization
-            Countly.q.push(['track_sessions']);
-            Countly.q.push(['track_pageview']);
-            Countly.q.push(['track_clicks']);
-            Countly.q.push(['track_scrolls']);
-            Countly.q.push(['track_errors']);
+            setTimeout(function() {
+                Countly.q.push(['track_sessions']);
+                Countly.q.push(['track_pageview']);
+                Countly.q.push(['track_clicks']);
+                Countly.q.push(['track_scrolls']);
+                Countly.q.push(['track_errors']);
+            }, 1000);
         };
         var s = document.getElementsByTagName('script')[0]; 
         s.parentNode.insertBefore(cly, s);
@@ -211,10 +218,11 @@
         <div class="container">
             <h2>Contact Me</h2>
             <p class="contact-text">Feel free to reach out to me at <a href="mailto:jeetshile@gmail.com">jeetshile@gmail.com</a> or use the form below:</p>
-            <form id="contact-form" method="POST" action="https://formspree.io/f/jeetshile@gmail.com">
+            <form id="contact-form" method="POST" action="https://formspree.io/f/xpzvnwkj">
                 <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
+                <input type="email" name="_replyto" placeholder="Email" required>
                 <textarea name="message" placeholder="Message" required></textarea>
+                <input type="hidden" name="_subject" value="Portfolio Contact Form">
                 <button type="submit">Send Message</button>
             </form>
         </div>
