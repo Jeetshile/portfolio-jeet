@@ -1,4 +1,4 @@
- // Define classes first
+// Define classes first
 class CubeDemo {
     constructor(container) {
         this.container = container;
@@ -46,7 +46,9 @@ class CubeDemo {
             
             // Create scene with gradient background
             this.scene = new THREE.Scene();
-            const gradientTexture = new THREE.TextureLoader().load('images/gradient.png');
+            // Create a data URL for the gradient
+            const gradientDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+            const gradientTexture = new THREE.TextureLoader().load(gradientDataURL);
             this.scene.background = gradientTexture;
             
             // Create camera with better positioning
@@ -367,7 +369,9 @@ class WaveDemo {
             
             // Create scene with gradient background
             this.scene = new THREE.Scene();
-            const gradientTexture = new THREE.TextureLoader().load('images/gradient.png');
+            // Create a data URL for the gradient
+            const gradientDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+            const gradientTexture = new THREE.TextureLoader().load(gradientDataURL);
             this.scene.background = gradientTexture;
             
             // Create camera with better positioning

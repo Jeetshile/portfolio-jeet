@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Countly Analytics Integration -->
+    <!--
     <script type='text/javascript'>
     // Initialize Countly
     var Countly = Countly || {};
@@ -21,7 +22,6 @@
     // Provide your Countly server URL and app key
     Countly.app_key = '2a7c10dcd1292e107b6af5f5acbb81ee';
     Countly.url = 'https://jeet-9859776896d0a.flex.countly.com';
-    Countly.debug = true;
 
     // Load Countly script
     (function() {
@@ -31,16 +31,16 @@
         cly.src = 'https://cdn.jsdelivr.net/npm/countly-sdk-web@latest/lib/countly.min.js';
         cly.onload = function() {
             Countly.init({
-                app_key: '2a7c10dcd1292e107b6af5f5acbb81ee',
-                url: 'https://jeet-9859776896d0a.flex.countly.com',
-                debug: true,
+                app_key: Countly.app_key,
+                url: Countly.url,
+                debug: false,
                 use_session_cookie: true,
-                interval: 10000,
+                interval: 30000,
                 storage: "localStorage",
                 secure_cookies: true,
-                session_update: 60,
-                inactivity_time: 20,
-                offline_mode: false,
+                session_update: 120,
+                inactivity_time: 30,
+                offline_mode: true,
                 force_post: false,
                 device_id: 'portfolio-' + new Date().getTime(),
                 metrics: {
@@ -56,12 +56,13 @@
                 Countly.q.push(['track_clicks']);
                 Countly.q.push(['track_scrolls']);
                 Countly.q.push(['track_errors']);
-            }, 1000);
+            }, 2000);
         };
         var s = document.getElementsByTagName('script')[0]; 
         s.parentNode.insertBefore(cly, s);
     })();
     </script>
+    -->
 </head>
 <body>
     <header>
@@ -217,7 +218,7 @@
     <section id="contact">
         <div class="container">
             <h2>Contact Me</h2>
-            <p class="contact-text">Feel free to reach out to me at jeetshile@gmail.com or use the form below:</p>
+            <p class="contact-text">Feel free to reach out to me using the form below:</p>
             <form id="contact-form" method="POST" action="https://formspree.io/f/xpzvnwkj">
                 <input type="text" name="name" placeholder="Name" required>
                 <input type="email" name="_replyto" placeholder="Email" required>
@@ -239,7 +240,7 @@
             <a href="tel:+918850790703" title="+91 8850790703">
                 <i class="fas fa-phone"></i>
             </a>
-            <a href="mailto:jeetshile@gmail.com" title="jeetshile@gmail.com">
+            <a href="#contact" title="Contact Me">
                 <i class="fas fa-envelope"></i>
             </a>
         </div>
@@ -282,6 +283,6 @@
     <script src="js/animations.js"></script>
 
     <!-- Countly Events Tracking -->
-    <script src="js/countly-events.js"></script>
+    <!-- <script src="js/countly-events.js"></script> -->
 </body>
 </html> 
