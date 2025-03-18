@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- Add these meta tags in the head section -->
+<!-- Add security headers -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,20 +12,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Remove duplicate font preload -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" as="style">
+    
+    <!-- Add Open Graph tags -->
+    <meta property="og:title" content="Jeet Shile - Python Developer & Web Designer">
+    <meta property="og:description" content="Portfolio of Jeet Shile, a certified Python Developer specializing in web development and software solutions">
+    <meta property="og:image" content="images/IMG-20250309-WA0002.png">
+    <meta property="og:url" content="https://jeetshile.com">
+    <meta name="twitter:card" content="summary_large_image">
     
     <!-- Countly Analytics Integration -->
-    <!--
+    
     <script type='text/javascript'>
-    // Initialize Countly
     var Countly = Countly || {};
     Countly.q = Countly.q || [];
 
-    // Provide your Countly server URL and app key
-    Countly.app_key = '2a7c10dcd1292e107b6af5f5acbb81ee';
-    Countly.url = 'https://jeet-9859776896d0a.flex.countly.com';
-
-    // Load Countly script
     (function() {
         var cly = document.createElement('script'); 
         cly.type = 'text/javascript';
@@ -31,38 +35,42 @@
         cly.src = 'https://cdn.jsdelivr.net/npm/countly-sdk-web@latest/lib/countly.min.js';
         cly.onload = function() {
             Countly.init({
-                app_key: Countly.app_key,
-                url: Countly.url,
-                debug: false,
+                app_key: '2a7c10dcd1292e107b6af5f5acbb81ee',
+                url: 'https://jeet-9859776896d0a.flex.countly.com',
+                debug: false, // Disable debug in production
                 use_session_cookie: true,
-                interval: 30000,
+                interval: 60000,
                 storage: "localStorage",
                 secure_cookies: true,
-                session_update: 120,
-                inactivity_time: 30,
-                offline_mode: true,
-                force_post: false,
-                device_id: 'portfolio-' + new Date().getTime(),
+                session_update: 300,
+                inactivity_time: 60,
+                offline_mode: false,
+                force_post: true,
+                device_id: {
+                    enable_cookie: true,
+                    cookie_prefix: "cly_port_",
+                    cookie_timeout: 1209600
+                },
+                track_errors: true,
+                track_sessions: true,
                 metrics: {
                     app_version: '1.0',
                     platform: 'web'
                 }
             });
 
-            // Track events after initialization
-            setTimeout(function() {
-                Countly.q.push(['track_sessions']);
-                Countly.q.push(['track_pageview']);
-                Countly.q.push(['track_clicks']);
-                Countly.q.push(['track_scrolls']);
-                Countly.q.push(['track_errors']);
-            }, 2000);
+            Countly.q.push(['track_sessions']);
+            Countly.q.push(['track_pageview']);
+            Countly.q.push(['track_errors']);
         };
         var s = document.getElementsByTagName('script')[0]; 
         s.parentNode.insertBefore(cly, s);
     })();
     </script>
-    -->
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
 </head>
 <body>
     <header>
@@ -81,7 +89,17 @@
                     <path fill="#fff" d="M12,19h5v17h-5V19z M14.485,17h-0.028C12.965,17,12,15.888,12,14.499C12,13.08,12.995,12,14.514,12	c1.521,0,2.458,1.08,2.486,2.499C17,15.887,16.035,17,14.485,17z M36,36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698	c-1.501,0-2.313,1.012-2.707,1.99C24.957,25.543,25,26.511,25,27v9h-5V19h5v2.616C25.721,20.5,26.85,19,29.738,19	c3.578,0,6.261,2.25,6.261,7.274L36,36L36,36z"></path>
                 </svg>
             </a>
-            <button id="theme-toggle">Toggle Theme</button>
+            <!-- Update the theme toggle button -->
+            <button id="theme-toggle" aria-label="Toggle dark/light theme">Toggle Theme</button>
+            
+            <!-- Update the contact form -->
+            <form id="contact-form" method="POST" action="https://formspree.io/f/xpzvnwkj" aria-label="Contact form">
+            <input type="text" name="name" placeholder="Name" required aria-label="Your name">
+            <input type="email" name="_replyto" placeholder="Email" required aria-label="Your email">
+            <textarea name="message" placeholder="Message" required aria-label="Your message"></textarea>
+                <input type="hidden" name="_subject" value="Portfolio Contact Form">
+                <button type="submit">Send Message</button>
+            </form>
         </nav>
     </header>
 
@@ -109,7 +127,8 @@
         <div class="container">
             <h2>About Me</h2>
             <div class="about-content">
-                <img data-src="images/IMG-20250309-WA0002.png" alt="Jeet Shile - Python Developer" class="profile-photo lazy">
+                <!-- Update the profile image -->
+                <img data-src="images/IMG-20250309-WA0002.png" alt="Jeet Shile - Python Developer" class="profile-photo lazy" loading="lazy">
                 <p>Hello! I'm Jeet Shile, a certified Python Developer with expertise in modern web technologies and software development. I specialize in building robust Python applications and creating responsive, user-friendly web solutions that solve real-world problems.</p>
                 <p>With a strong foundation in Python programming and full-stack development, I strive to write clean, efficient code that delivers exceptional user experiences. My expertise includes Python frameworks like Django and Flask, along with modern JavaScript libraries.</p>
                 <div class="tech-stack">
@@ -263,12 +282,11 @@
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script>
-        // Check if Three.js loaded successfully
         window.addEventListener('load', function() {
             if (typeof THREE === 'undefined') {
                 console.error('Three.js failed to load');
                 document.querySelectorAll('.canvas-container').forEach(container => {
-                    container.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Error: Three.js library failed to load</p>';
+                    container.innerHTML = '<div role="alert" style="color: red; text-align: center; padding: 20px;">Error: 3D graphics temporarily unavailable. Please refresh the page.</div>';
                 });
             } else {
                 console.log('Three.js loaded successfully');
@@ -285,4 +303,4 @@
     <!-- Countly Events Tracking -->
     <!-- <script src="js/countly-events.js"></script> -->
 </body>
-</html> 
+</html>

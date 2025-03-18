@@ -46,10 +46,7 @@ class CubeDemo {
             
             // Create scene with gradient background
             this.scene = new THREE.Scene();
-            // Create a data URL for the gradient
-            const gradientDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-            const gradientTexture = new THREE.TextureLoader().load(gradientDataURL);
-            this.scene.background = gradientTexture;
+            this.scene.background = new THREE.Color(0x000000); // Black background
             
             // Create camera with better positioning
             this.camera = new THREE.PerspectiveCamera(
@@ -369,10 +366,7 @@ class WaveDemo {
             
             // Create scene with gradient background
             this.scene = new THREE.Scene();
-            // Create a data URL for the gradient
-            const gradientDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-            const gradientTexture = new THREE.TextureLoader().load(gradientDataURL);
-            this.scene.background = gradientTexture;
+            this.scene.background = new THREE.Color(0x000000); // Black background
             
             // Create camera with better positioning
             this.camera = new THREE.PerspectiveCamera(
