@@ -36,8 +36,8 @@
         cly.onload = function() {
             Countly.init({
                 app_key: '2a7c10dcd1292e107b6af5f5acbb81ee',
-                url: 'https://jeet-eb63a7b32fe86.flex.countly.com/',
-                debug: false, // Disable debug in production
+                url: 'https://jeet-eb63a7b32fe86.flex.countly.com', // Removed trailing slash
+                debug: true, // Temporarily enable debug to see detailed logs
                 use_session_cookie: true,
                 interval: 60000,
                 storage: "localStorage",
@@ -68,7 +68,7 @@
     })();
     </script>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline'; connect-src 'self' https://jeet-eb63a7b32fe86.flex.countly.com;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
 </head>
@@ -301,6 +301,6 @@
     <script src="js/animations.js"></script>
 
     <!-- Countly Events Tracking -->
-    <!-- <script src="js/countly-events.js"></script> -->
+    <script src="js/countly-events.js"></script>
 </body>
 </html>
